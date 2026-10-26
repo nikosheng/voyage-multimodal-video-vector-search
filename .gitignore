@@ -1,0 +1,19 @@
+# Python
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+*.pyc
+
+# Env files
+.env
+backend/.env
+
+# ffmpeg portable binary (downloaded by scripts/install_ffmpeg_linux.sh)
+backend/bin/
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
