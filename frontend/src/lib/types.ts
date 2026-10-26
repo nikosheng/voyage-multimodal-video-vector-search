@@ -1,6 +1,6 @@
 export interface Flavor {
   id: string;
-  name_zh: string;
+  name: string;
   taste: string;
   action_label: string;
   emoji: string;
@@ -21,7 +21,7 @@ export interface TopKMatch {
 export interface WishResponse {
   flavor: {
     id: string;
-    name_zh: string;
+    name: string;
     taste: string;
     emoji: string;
     color_hex: string;
@@ -57,7 +57,7 @@ export interface AppSettings {
 
 export interface DashboardFlavorStat {
   flavor_id: string;
-  name_zh: string;
+  name: string;
   emoji: string;
   color_hex: string;
   count: number;

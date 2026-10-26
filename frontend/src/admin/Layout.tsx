@@ -2,9 +2,9 @@ import { Navigate, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "./AuthContext";
 
 const navItems = [
-  { to: "/admin/flavors", label: "口味管理" },
-  { to: "/admin/sandbox", label: "Sandbox 測試" },
-  { to: "/admin/settings", label: "全域設定" },
+  { to: "/admin/flavors", label: "Flavors" },
+  { to: "/admin/sandbox", label: "Sandbox Test" },
+  { to: "/admin/settings", label: "Settings" },
 ];
 
 export default function Layout() {
@@ -37,7 +37,7 @@ export default function Layout() {
           onClick={logout}
           className="mt-10 w-full rounded-lg bg-white/5 px-4 py-2 text-sm text-slate-300 hover:bg-white/10"
         >
-          登出
+          Log Out
         </button>
       </aside>
       <main className="flex-1 overflow-y-auto p-8">

@@ -20,7 +20,7 @@ export default function WebcamRecorder({
   recordSeconds = 4,
   onRecorded,
   disabled = false,
-  buttonLabel = "開始許願",
+  buttonLabel = "Make a Wish",
 }: WebcamRecorderProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -46,7 +46,7 @@ export default function WebcamRecorder({
           videoRef.current.srcObject = stream;
         }
       })
-      .catch((err) => setError(`無法存取鏡頭: ${err.message}`));
+      .catch((err) => setError(`Unable to access the camera: ${err.message}`));
 
     return () => {
       cancelled = true;
@@ -57,7 +57,7 @@ export default function WebcamRecorder({
   const startRecording = useCallback(() => {
     const stream = mediaStreamRef.current;
     if (!stream) {
-      setError("鏡頭仲未準備好，請稍後再試");
+      setError("The camera isn't ready yet, please try again in a moment");
       return;
     }
     setError(null);
@@ -139,13 +139,13 @@ export default function WebcamRecorder({
         {state === "recording" && (
           <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-black/60 px-3 py-1 text-sm text-white">
             <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
-            錄影中
+            Recording
           </div>
         )}
         {state === "processing" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/70">
             <span className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-white" />
-            <span className="text-lg text-white">🎅 Santa 施法緊...</span>
+            <span className="text-lg text-white">🎅 Santa is working his magic...</span>
           </div>
         )}
       </div>
@@ -157,7 +157,7 @@ export default function WebcamRecorder({
         disabled={disabled || state !== "idle"}
         className="rounded-full bg-emerald-600 px-8 py-3 text-lg font-bold text-white shadow-lg transition hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {state === "idle" ? buttonLabel : "請等等..."}
+        {state === "idle" ? buttonLabel : "Please wait..."}
       </button>
     </div>
   );

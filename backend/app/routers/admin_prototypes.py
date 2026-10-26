@@ -18,7 +18,7 @@ router = APIRouter(prefix="/admin", tags=["admin-prototypes"], dependencies=[Dep
 
 async def _assert_flavor_exists(flavor_id: str):
     if not await flavors_col().find_one({"_id": flavor_id}):
-        raise HTTPException(status_code=404, detail="flavor 不存在")
+        raise HTTPException(status_code=404, detail="Flavor not found")
 
 
 @router.post("/flavors/{flavor_id}/prototypes/text")
@@ -65,7 +65,7 @@ async def add_video_prototype(flavor_id: str, video: UploadFile = File(...)):
                 embedding, dim = await run_in_threadpool(embed_video_document, mp4_path)
             except Exception as e:  # noqa: BLE001
                 await get_gridfs().delete(gridfs_id)
-                raise HTTPException(status_code=502, detail=f"Voyage embedding 失敗: {e}") from e
+                raise HTTPException(status_code=502, detail=f"Voyage embedding failed: {e}") from e
 
     doc = {
         "flavor_id": flavor_id,
@@ -100,7 +100,7 @@ async def toggle_prototype(prototype_id: str, is_active: bool):
         {"_id": ObjectId(prototype_id)}, {"$set": {"is_active": is_active}}
     )
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="prototype 不存在")
+        raise HTTPException(status_code=404, detail="Prototype not found")
     return {"updated": True}
 
 
@@ -108,7 +108,7 @@ async def toggle_prototype(prototype_id: str, is_active: bool):
 async def delete_prototype(prototype_id: str):
     doc = await prototypes_col().find_one({"_id": ObjectId(prototype_id)})
     if not doc:
-        raise HTTPException(status_code=404, detail="prototype 不存在")
+        raise HTTPException(status_code=404, detail="Prototype not found")
     if doc.get("source_video_gridfs_id"):
         await get_gridfs().delete(ObjectId(doc["source_video_gridfs_id"]))
     await prototypes_col().delete_one({"_id": ObjectId(prototype_id)})
@@ -129,7 +129,7 @@ async def sandbox_test(video: UploadFile = File(...)):
             try:
                 query_vector, usage = await run_in_threadpool(embed_video_query, mp4_path)
             except Exception as e:  # noqa: BLE001
-                raise HTTPException(status_code=502, detail=f"Voyage embedding 失敗: {e}") from e
+                raise HTTPException(status_code=502, detail=f"Voyage embedding failed: {e}") from e
 
     match_result = await matching.match_embedding_to_flavor(query_vector)
     return {**match_result, "voyage_usage": usage}

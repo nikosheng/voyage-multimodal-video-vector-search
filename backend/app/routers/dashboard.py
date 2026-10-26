@@ -23,7 +23,7 @@ async def get_stats():
         result.append(
             {
                 "flavor_id": f["_id"],
-                "name_zh": f["name_zh"],
+                "name": f["name"],
                 "emoji": f["emoji"],
                 "color_hex": f["color_hex"],
                 "count": s.get("count", 0),
@@ -53,7 +53,7 @@ async def stream_wishes():
 
                     payload = {
                         "flavor_id": flavor_id,
-                        "name_zh": flavor["name_zh"] if flavor else "未知",
+                        "name": flavor["name"] if flavor else "Unknown",
                         "emoji": flavor["emoji"] if flavor else "❓",
                         "color_hex": flavor["color_hex"] if flavor else "#999999",
                         "is_fallback": doc.get("is_fallback", False),

@@ -23,7 +23,7 @@ export default function Login() {
       login(res.access_token);
       navigate("/admin/flavors");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "登入失敗");
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
@@ -35,17 +35,17 @@ export default function Login() {
         onSubmit={handleSubmit}
         className="flex w-full max-w-sm flex-col gap-4 rounded-2xl bg-slate-900 p-8 shadow-xl"
       >
-        <h1 className="text-center text-2xl font-bold">🎅 Admin 登入</h1>
+        <h1 className="text-center text-2xl font-bold">🎅 Admin Login</h1>
         <input
           className="rounded-lg bg-slate-800 px-4 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
-          placeholder="管理員帳號"
+          placeholder="Admin username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
         <input
           type="password"
           className="rounded-lg bg-slate-800 px-4 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
-          placeholder="密碼"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
@@ -55,7 +55,7 @@ export default function Login() {
           disabled={loading}
           className="rounded-lg bg-emerald-600 py-2 font-semibold transition hover:bg-emerald-500 disabled:opacity-50"
         >
-          {loading ? "登入緊..." : "登入"}
+          {loading ? "Logging in..." : "Log In"}
         </button>
       </form>
     </div>

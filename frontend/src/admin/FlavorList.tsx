@@ -4,7 +4,7 @@ import { apiGet, apiPost } from "../lib/api";
 import type { Flavor } from "../lib/types";
 
 const emptyForm = {
-  name_zh: "",
+  name: "",
   taste: "",
   action_label: "",
   emoji: "🍬",
@@ -38,7 +38,7 @@ export default function FlavorList() {
       setShowForm(false);
       loadFlavors();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "新增失敗");
+      setError(err instanceof Error ? err.message : "Failed to create flavor");
     } finally {
       setLoading(false);
     }
@@ -47,12 +47,12 @@ export default function FlavorList() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">口味 / 食品管理</h1>
+        <h1 className="text-2xl font-bold">Flavors & Items</h1>
         <button
           onClick={() => setShowForm((v) => !v)}
           className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold hover:bg-emerald-500"
         >
-          {showForm ? "取消" : "+ 新增口味"}
+          {showForm ? "Cancel" : "+ New Flavor"}
         </button>
       </div>
 
@@ -61,15 +61,15 @@ export default function FlavorList() {
           onSubmit={handleCreate}
           className="mb-8 grid grid-cols-2 gap-4 rounded-2xl bg-slate-900 p-6"
         >
-          <Field label="名稱">
+          <Field label="Name">
             <input
               required
               className="input"
-              value={form.name_zh}
-              onChange={(e) => setForm({ ...form, name_zh: e.target.value })}
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
           </Field>
-          <Field label="口味 / 食品">
+          <Field label="Taste / Item">
             <input
               required
               className="input"
@@ -77,11 +77,11 @@ export default function FlavorList() {
               onChange={(e) => setForm({ ...form, taste: e.target.value })}
             />
           </Field>
-          <Field label="動作標籤 (action_label)">
+          <Field label="Action Label (action_label)">
             <input
               required
               className="input"
-              placeholder="例如 cold_shiver"
+              placeholder="e.g. cold_shiver"
               value={form.action_label}
               onChange={(e) => setForm({ ...form, action_label: e.target.value })}
             />
@@ -93,7 +93,7 @@ export default function FlavorList() {
               onChange={(e) => setForm({ ...form, emoji: e.target.value })}
             />
           </Field>
-          <Field label="顏色">
+          <Field label="Color">
             <input
               type="color"
               className="h-10 w-full rounded-lg"
@@ -101,7 +101,7 @@ export default function FlavorList() {
               onChange={(e) => setForm({ ...form, color_hex: e.target.value })}
             />
           </Field>
-          <Field label="描述">
+          <Field label="Description">
             <input
               className="input"
               value={form.description}
@@ -114,7 +114,7 @@ export default function FlavorList() {
               checked={form.is_fallback}
               onChange={(e) => setForm({ ...form, is_fallback: e.target.checked })}
             />
-            設定為 fallback 口味（信心分數過低時使用）
+            Mark as the fallback flavor (used when confidence is too low)
           </label>
           {error && <p className="col-span-2 text-red-400">{error}</p>}
           <button
@@ -122,7 +122,7 @@ export default function FlavorList() {
             disabled={loading}
             className="col-span-2 rounded-lg bg-emerald-600 py-2 font-semibold hover:bg-emerald-500 disabled:opacity-50"
           >
-            {loading ? "建立緊..." : "建立口味"}
+            {loading ? "Creating..." : "Create Flavor"}
           </button>
         </form>
       )}
@@ -144,11 +144,11 @@ export default function FlavorList() {
               )}
               {!f.is_active && (
                 <span className="rounded-full bg-slate-500/20 px-2 py-0.5 text-xs text-slate-400">
-                  停用
+                  inactive
                 </span>
               )}
             </div>
-            <h3 className="text-lg font-bold">{f.name_zh}</h3>
+            <h3 className="text-lg font-bold">{f.name}</h3>
             <p className="text-sm text-slate-300">{f.taste}</p>
             <p className="text-xs text-slate-500">action_label: {f.action_label}</p>
           </Link>

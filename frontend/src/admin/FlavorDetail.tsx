@@ -38,7 +38,7 @@ export default function FlavorDetail() {
   };
 
   const handleDeleteFlavor = async () => {
-    if (!flavorId || !confirm("確定要刪除呢個口味？相關原型都會一併刪除。")) return;
+    if (!flavorId || !confirm("Are you sure you want to delete this flavor? All related prototypes will also be deleted.")) return;
     await apiDelete(`/admin/flavors/${flavorId}`, true);
     navigate("/admin/flavors");
   };
@@ -56,7 +56,7 @@ export default function FlavorDetail() {
       setTextInput("");
       loadPrototypes();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "新增文字原型失敗");
+      setError(e instanceof Error ? e.message : "Failed to add text prototype");
     } finally {
       setBusy(false);
     }
@@ -72,7 +72,7 @@ export default function FlavorDetail() {
       await apiUpload(`/admin/flavors/${flavorId}/prototypes/video`, formData, true);
       loadPrototypes();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "上傳示範片失敗");
+      setError(e instanceof Error ? e.message : "Failed to upload demo clip");
     } finally {
       setBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -85,17 +85,17 @@ export default function FlavorDetail() {
   };
 
   const deletePrototype = async (prototypeId: string) => {
-    if (!confirm("確定要刪除呢個原型？")) return;
+    if (!confirm("Are you sure you want to delete this prototype?")) return;
     await apiDelete(`/admin/prototypes/${prototypeId}`, true);
     loadPrototypes();
   };
 
-  if (!flavor) return <p>載入緊...</p>;
+  if (!flavor) return <p>Loading...</p>;
 
   return (
     <div className="max-w-3xl">
       <button onClick={() => navigate("/admin/flavors")} className="mb-4 text-slate-400 hover:text-white">
-        ← 返回口味列表
+        ← Back to Flavors
       </button>
 
       <div
@@ -105,7 +105,7 @@ export default function FlavorDetail() {
         <div className="mb-4 flex items-center gap-4">
           <span className="text-5xl">{flavor.emoji}</span>
           <div>
-            <h1 className="text-2xl font-bold">{flavor.name_zh}</h1>
+            <h1 className="text-2xl font-bold">{flavor.name}</h1>
             <p className="text-slate-300">{flavor.taste}</p>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function FlavorDetail() {
               checked={flavor.is_active}
               onChange={(e) => updateField({ is_active: e.target.checked })}
             />
-            啟用中
+            Active
           </label>
           <label className="flex items-center gap-2">
             <input
@@ -125,7 +125,7 @@ export default function FlavorDetail() {
               checked={flavor.is_fallback}
               onChange={(e) => updateField({ is_fallback: e.target.checked })}
             />
-            Fallback 口味
+            Fallback Flavor
           </label>
         </div>
 
@@ -133,20 +133,20 @@ export default function FlavorDetail() {
           onClick={handleDeleteFlavor}
           className="mt-4 rounded-lg bg-red-600/80 px-4 py-2 text-sm hover:bg-red-600"
         >
-          刪除此口味
+          Delete This Flavor
         </button>
       </div>
 
-      <h2 className="mb-4 text-xl font-bold">動作原型（Prototypes）</h2>
+      <h2 className="mb-4 text-xl font-bold">Action Prototypes</h2>
 
       <div className="mb-6 flex flex-col gap-3 rounded-2xl bg-slate-900 p-5">
         <p className="text-sm text-slate-400">
-          新增文字原型（bootstrap，免錄片）或上傳真實示範片（更準確，會長期存喺 GridFS）。
+          Add a text prototype (bootstrap, no video needed) or upload a real demo clip (more accurate, stored long-term in GridFS).
         </p>
         <div className="flex gap-2">
           <input
             className="input flex-1"
-            placeholder="輸入動作描述，例如：一個人凍到喺度震..."
+            placeholder="Describe the action, e.g. A person is shivering from the cold..."
             value={textInput}
             onChange={(e) => setTextInput(e.target.value)}
           />
@@ -155,7 +155,7 @@ export default function FlavorDetail() {
             disabled={busy || !textInput.trim()}
             className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold hover:bg-emerald-500 disabled:opacity-50"
           >
-            新增文字原型
+            Add Text Prototype
           </button>
         </div>
         <div>
@@ -184,7 +184,7 @@ export default function FlavorDetail() {
                 {p.modality}
               </span>
               <span className="text-sm">
-                {p.modality === "text" ? p.text_content : `影片原型 (${p.source_video_gridfs_id})`}
+                {p.modality === "text" ? p.text_content : `Video prototype (${p.source_video_gridfs_id})`}
               </span>
             </div>
             <div className="flex gap-2">
@@ -192,19 +192,19 @@ export default function FlavorDetail() {
                 onClick={() => toggleActive(p.id, p.is_active)}
                 className="rounded-lg bg-white/10 px-3 py-1 text-xs hover:bg-white/20"
               >
-                {p.is_active ? "停用" : "啟用"}
+                {p.is_active ? "Deactivate" : "Activate"}
               </button>
               <button
                 onClick={() => deletePrototype(p.id)}
                 className="rounded-lg bg-red-600/60 px-3 py-1 text-xs hover:bg-red-600"
               >
-                刪除
+                Delete
               </button>
             </div>
           </li>
         ))}
         {prototypes.length === 0 && (
-          <p className="text-slate-500">仲未有任何原型，請新增文字描述或上傳示範片。</p>
+          <p className="text-slate-500">No prototypes yet. Add a text description or upload a demo clip.</p>
         )}
       </ul>
     </div>

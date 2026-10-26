@@ -14,7 +14,7 @@ export default function Settings() {
     apiGet<Flavor[]>("/admin/flavors", true).then(setFlavors);
   }, []);
 
-  if (!settings) return <p>載入緊...</p>;
+  if (!settings) return <p>Loading...</p>;
 
   const handleSave = async () => {
     setSaving(true);
@@ -22,7 +22,7 @@ export default function Settings() {
     try {
       const updated = await apiPatch<AppSettings>("/admin/settings", settings, true);
       setSettings(updated);
-      setMessage("設定已儲存！");
+      setMessage("Settings saved!");
     } finally {
       setSaving(false);
     }
@@ -33,7 +33,7 @@ export default function Settings() {
     setMessage(null);
     try {
       const res = await apiPost<{ updated: number }>("/admin/recompute-embeddings", {}, true);
-      setMessage(`已重新計算 ${res.updated} 個文字原型嘅向量`);
+      setMessage(`Recomputed vectors for ${res.updated} text prototypes`);
     } finally {
       setRecomputing(false);
     }
@@ -41,10 +41,10 @@ export default function Settings() {
 
   return (
     <div className="max-w-xl">
-      <h1 className="mb-6 text-2xl font-bold">全域設定</h1>
+      <h1 className="mb-6 text-2xl font-bold">Global Settings</h1>
 
       <div className="flex flex-col gap-4 rounded-2xl bg-slate-900 p-6">
-        <Field label="Confidence Threshold（低於此分數觸發 fallback）">
+        <Field label="Confidence Threshold (triggers fallback below this score)">
           <input
             type="number"
             step="0.01"
@@ -58,22 +58,22 @@ export default function Settings() {
           />
         </Field>
 
-        <Field label="Fallback 口味">
+        <Field label="Fallback Flavor">
           <select
             className="input"
             value={settings.fallback_flavor_id ?? ""}
             onChange={(e) => setSettings({ ...settings, fallback_flavor_id: e.target.value })}
           >
-            <option value="">（未設定）</option>
+            <option value="">(not set)</option>
             {flavors.map((f) => (
               <option key={f.id} value={f.id}>
-                {f.emoji} {f.name_zh}
+                {f.emoji} {f.name}
               </option>
             ))}
           </select>
         </Field>
 
-        <Field label="Top K（比對候選數量）">
+        <Field label="Top K (number of candidates compared)">
           <input
             type="number"
             min={1}
@@ -83,7 +83,7 @@ export default function Settings() {
           />
         </Field>
 
-        <Field label="Num Candidates（$vectorSearch 搜尋範圍）">
+        <Field label="Num Candidates ($vectorSearch search scope)">
           <input
             type="number"
             min={1}
@@ -102,21 +102,21 @@ export default function Settings() {
           disabled={saving}
           className="rounded-lg bg-emerald-600 py-2 font-semibold hover:bg-emerald-500 disabled:opacity-50"
         >
-          {saving ? "儲存緊..." : "儲存設定"}
+          {saving ? "Saving..." : "Save Settings"}
         </button>
 
         <hr className="border-white/10" />
 
         <div>
           <p className="mb-2 text-sm text-slate-400">
-            當 embedding model 升級後，重新計算所有文字原型嘅向量：
+            After upgrading the embedding model, recompute vectors for all text prototypes:
           </p>
           <button
             onClick={handleRecompute}
             disabled={recomputing}
             className="rounded-lg bg-indigo-600 px-4 py-2 font-semibold hover:bg-indigo-500 disabled:opacity-50"
           >
-            {recomputing ? "計算緊..." : "重新計算全部向量"}
+            {recomputing ? "Computing..." : "Recompute All Vectors"}
           </button>
         </div>
       </div>

@@ -11,7 +11,7 @@ def utcnow() -> datetime:
 
 # ---------- flavors ----------
 class FlavorIn(BaseModel):
-    name_zh: str
+    name: str
     taste: str
     action_label: str
     emoji: str = "🍬"
@@ -23,7 +23,7 @@ class FlavorIn(BaseModel):
 
 
 class FlavorUpdate(BaseModel):
-    name_zh: Optional[str] = None
+    name: Optional[str] = None
     taste: Optional[str] = None
     action_label: Optional[str] = None
     emoji: Optional[str] = None

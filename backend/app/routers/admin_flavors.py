@@ -35,11 +35,11 @@ async def create_flavor(payload: FlavorIn):
 async def update_flavor(flavor_id: str, payload: FlavorUpdate):
     update_fields = {k: v for k, v in payload.model_dump().items() if v is not None}
     if not update_fields:
-        raise HTTPException(status_code=400, detail="冇任何欄位需要更新")
+        raise HTTPException(status_code=400, detail="No fields to update")
     update_fields["updated_at"] = datetime.now(timezone.utc)
     result = await flavors_col().update_one({"_id": flavor_id}, {"$set": update_fields})
     if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="flavor 不存在")
+        raise HTTPException(status_code=404, detail="Flavor not found")
     doc = await flavors_col().find_one({"_id": flavor_id})
     doc["id"] = doc.pop("_id")
     return doc

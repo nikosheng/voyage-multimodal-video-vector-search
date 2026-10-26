@@ -30,7 +30,7 @@ async def make_a_wish(video: UploadFile = File(...)):
             try:
                 query_vector, usage = await run_in_threadpool(embed_video_query, mp4_path)
             except Exception as e:  # noqa: BLE001
-                raise HTTPException(status_code=502, detail=f"Voyage embedding 失敗: {e}") from e
+                raise HTTPException(status_code=502, detail=f"Voyage embedding failed: {e}") from e
 
     # query_vector only lives in this function's local memory; it is garbage
     # collected once the response completes and is never written to disk/DB
@@ -38,11 +38,11 @@ async def make_a_wish(video: UploadFile = File(...)):
 
     matched_flavor_id = match_result["matched_flavor_id"]
     if not matched_flavor_id:
-        raise HTTPException(status_code=500, detail="未配置任何口味，請先喺 admin 後台新增 flavor")
+        raise HTTPException(status_code=500, detail="No flavors configured yet. Please add a flavor in the admin console first.")
 
     flavor_doc = await flavors_col().find_one({"_id": matched_flavor_id})
     if not flavor_doc:
-        raise HTTPException(status_code=500, detail="配對到嘅口味不存在，請檢查後台設定")
+        raise HTTPException(status_code=500, detail="The matched flavor no longer exists. Please check the admin settings.")
 
     latency_ms = int((time.monotonic() - start) * 1000)
 
@@ -61,7 +61,7 @@ async def make_a_wish(video: UploadFile = File(...)):
     return {
         "flavor": {
             "id": flavor_doc["_id"],
-            "name_zh": flavor_doc["name_zh"],
+            "name": flavor_doc["name"],
             "taste": flavor_doc["taste"],
             "emoji": flavor_doc["emoji"],
             "color_hex": flavor_doc["color_hex"],
