@@ -71,6 +71,9 @@ pip install -r requirements.txt
 
 cp .env.example .env
 # edit .env: set MONGODB_URI, VOYAGE_API_KEY, JWT_SECRET
+# If you're using a MongoDB Atlas-hosted Voyage API key (prefix "al-"), you
+# can optionally set VOYAGE_BASE_URL=https://ai.mongodb.com/v1 (the SDK also
+# auto-detects this from the "al-" key prefix if left unset)
 
 # generate the admin password hash and paste it into .env as ADMIN_PASSWORD_HASH
 python scripts/hash_password.py "your-chosen-admin-password"

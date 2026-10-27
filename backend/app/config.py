@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     # Voyage AI
     voyage_api_key: str = ""
     voyage_model: str = "voyage-multimodal-3.5"
+    # Optional: override the Voyage API endpoint, e.g. the MongoDB
+    # Atlas-hosted Voyage endpoint (https://ai.mongodb.com/v1). If unset, the
+    # Voyage SDK auto-detects the right endpoint based on the API key prefix.
+    voyage_base_url: str | None = None
 
     # Admin auth
     admin_username: str = "admin"

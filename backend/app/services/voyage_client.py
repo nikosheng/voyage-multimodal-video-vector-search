@@ -18,7 +18,7 @@ from app.config import get_settings
 @lru_cache
 def get_voyage_client() -> voyageai.Client:
     settings = get_settings()
-    return voyageai.Client(api_key=settings.voyage_api_key)
+    return voyageai.Client(api_key=settings.voyage_api_key, base_url=settings.voyage_base_url)
 
 
 def embed_video_query(video_path: str) -> tuple[list[float], dict]:
