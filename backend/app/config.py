@@ -1,9 +1,6 @@
 from functools import lru_cache
-from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-BACKEND_ROOT = Path(__file__).resolve().parent.parent
 
 
 class Settings(BaseSettings):
@@ -31,11 +28,11 @@ class Settings(BaseSettings):
     temp_dir: str = "/tmp/wish_in_motion"
     cors_origins: str = "http://localhost:5173,http://localhost:4173"
 
-    # ffmpeg: prefer the portable static binary downloaded by
-    # scripts/install_ffmpeg_linux.sh (backend/bin/ffmpeg). Fall back to the
-    # system PATH ffmpeg/ffprobe (e.g. brew/apt installed) if not found. This
-    # lets the same code run unchanged on macOS (dev) and a Debian 12 GCE VM
-    # (production).
+    # ffmpeg: resolved from PATH by default. In the Docker image, ffmpeg/
+    # ffprobe are static binaries copied into /usr/local/bin (see
+    # backend/Dockerfile, sourced from mwader/static-ffmpeg). For local dev
+    # (e.g. macOS), install ffmpeg via `brew install ffmpeg` so it's on PATH,
+    # or set these to an explicit path.
     ffmpeg_binary_path: str | None = None
     ffprobe_binary_path: str | None = None
 
@@ -45,21 +42,11 @@ class Settings(BaseSettings):
 
     @property
     def resolved_ffmpeg_path(self) -> str:
-        if self.ffmpeg_binary_path:
-            return self.ffmpeg_binary_path
-        bundled = BACKEND_ROOT / "bin" / "ffmpeg"
-        if bundled.exists():
-            return str(bundled)
-        return "ffmpeg"
+        return self.ffmpeg_binary_path or "ffmpeg"
 
     @property
     def resolved_ffprobe_path(self) -> str:
-        if self.ffprobe_binary_path:
-            return self.ffprobe_binary_path
-        bundled = BACKEND_ROOT / "bin" / "ffprobe"
-        if bundled.exists():
-            return str(bundled)
-        return "ffprobe"
+        return self.ffprobe_binary_path or "ffprobe"
 
 
 @lru_cache

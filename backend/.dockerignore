@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+bin/
+.env
+.env.example
+.env copy.example
+*.egg-info/

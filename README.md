@@ -40,8 +40,8 @@ backend/    FastAPI app, Voyage integration, Atlas Vector Search matching
     routers/      API endpoints (wish, dashboard, admin_*, auth)
     services/      voyage_client, video_utils (ffmpeg), matching, auth
     db/            mongo connection + pydantic models
+  Dockerfile  app image with ffmpeg baked in (see Docker deployment below)
   scripts/
-    install_ffmpeg_linux.sh   portable static ffmpeg binary (Linux amd64/arm64)
     hash_password.py          generate ADMIN_PASSWORD_HASH
     seed_data.py              seed default flavors + bootstrap text prototypes
     setup_atlas_index.py      create the Atlas Vector Search index
@@ -59,7 +59,7 @@ frontend/   React + Vite + Tailwind
 - A MongoDB Atlas cluster (Flex/Serverless or M10+) with **Atlas Search /
   Vector Search** enabled
 - A Voyage AI API key (https://www.voyageai.com/)
-- ffmpeg (see below for the portable Linux option)
+- ffmpeg (only needed if running the backend without Docker — see below)
 
 ## Backend setup
 
@@ -87,22 +87,44 @@ python scripts/setup_atlas_index.py
 uvicorn app.main:app --reload --port 8000
 ```
 
-### ffmpeg: portable binary for Linux deployment (e.g. Debian 12 GCE VM)
+### ffmpeg: local dev without Docker
 
-`ffmpeg-python` just shells out to an `ffmpeg` executable. To avoid depending
-on whatever apt package (or lack thereof) exists on the target VM, this repo
-can use a self-contained static Linux binary instead:
+`ffmpeg-python` just shells out to an `ffmpeg`/`ffprobe` executable on
+`PATH`. For local development without Docker, install it directly
+(e.g. `brew install ffmpeg` on macOS). No further configuration is needed —
+the app resolves `ffmpeg`/`ffprobe` from `PATH` by default (see
+`FFMPEG_BINARY_PATH`/`FFPROBE_BINARY_PATH` in `.env.example` for explicit
+overrides).
+
+## Docker deployment (recommended for production, e.g. a GCE VM)
+
+`backend/Dockerfile` is a multi-stage build that copies current,
+actively-maintained static `ffmpeg`/`ffprobe` binaries from the
+[`mwader/static-ffmpeg`](https://hub.docker.com/r/mwader/static-ffmpeg)
+image (pinned to `9.0.2-1`) into a `python:3.12-slim` image — this avoids
+relying on the target OS's apt-packaged ffmpeg, which is typically a Debian
+release behind upstream (e.g. Debian 12 ships ffmpeg 5.1.x while current
+upstream is 9.x).
 
 ```bash
-# Run this on the target Linux machine (Debian 12 VM, etc.)
-bash backend/scripts/install_ffmpeg_linux.sh
+# build + run via docker compose (reads backend/.env)
+cp backend/.env.example backend/.env   # fill in MONGODB_URI, VOYAGE_API_KEY, etc.
+docker compose up --build
 ```
 
-This downloads the official static build (amd64/arm64, zero dependencies,
-no root required) into `backend/bin/ffmpeg`. The app automatically prefers
-`backend/bin/ffmpeg` if present, and falls back to the system `PATH` ffmpeg
-otherwise (e.g. a local `brew install ffmpeg` on macOS during development).
-No code changes are needed between environments.
+Or with plain Docker:
+
+```bash
+cd backend
+docker build -t wish-in-motion-backend .
+docker run --rm -p 8000:8000 --env-file .env wish-in-motion-backend
+```
+
+No host-level ffmpeg setup is needed — it's baked into the image. One-time
+setup scripts (`scripts/hash_password.py`, `scripts/seed_data.py`,
+`scripts/setup_atlas_index.py`) can still be run locally with a Python venv
+against the same Atlas cluster before/independently of running the
+containerized backend.
 
 ## Frontend setup
 
