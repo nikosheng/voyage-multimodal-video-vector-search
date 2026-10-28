@@ -6,6 +6,10 @@ voyageai==0.5.0
 python-multipart==0.0.20
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+# passlib 1.7.4 reads bcrypt.__about__.__version__, which was removed in
+# bcrypt>=4.1 -- pin to the last compatible 4.x release to avoid
+# "(trapped) error reading bcrypt version" / hash failures.
+bcrypt==4.0.1
 pydantic==2.10.4
 pydantic-settings==2.7.0
 python-dotenv==1.0.1

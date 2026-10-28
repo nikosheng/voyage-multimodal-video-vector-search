@@ -61,6 +61,22 @@ frontend/   React + Vite + Tailwind
 - A Voyage AI API key (https://www.voyageai.com/)
 - ffmpeg (only needed if running the backend without Docker — see below)
 
+## Quick start with Make
+
+A `Makefile` wraps the common lifecycle commands below. Run `make help` to
+list everything available. Typical first-time setup:
+
+```bash
+make install           # create backend venv + install deps, npm install frontend
+make env                # copy backend/.env.example -> backend/.env (edit it before continuing)
+make hash-password PASSWORD="your-chosen-admin-password"  # paste the output into .env as ADMIN_PASSWORD_HASH
+make seed               # seed default flavors + bootstrap text prototypes
+make setup-atlas-index  # create the Atlas Vector Search index
+make dev                # run backend (:8000) + frontend (:5173) together
+```
+
+Or for a Docker-based backend: `make docker-up` / `make docker-logs` / `make docker-down`.
+
 ## Backend setup
 
 ```bash
