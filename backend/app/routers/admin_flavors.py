@@ -2,10 +2,11 @@
 import uuid
 from datetime import datetime, timezone
 
+from bson import ObjectId
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.db.models import FlavorIn, FlavorUpdate
-from app.db.mongo import flavors_col, prototypes_col
+from app.db.mongo import flavors_col, get_gridfs, prototypes_col
 from app.services.auth import get_current_admin
 
 router = APIRouter(prefix="/admin/flavors", tags=["admin-flavors"], dependencies=[Depends(get_current_admin)])
@@ -47,6 +48,12 @@ async def update_flavor(flavor_id: str, payload: FlavorUpdate):
 
 @router.delete("/{flavor_id}")
 async def delete_flavor(flavor_id: str):
-    await flavors_col().delete_one({"_id": flavor_id})
+    # Clean up any GridFS reference-video blobs before deleting the
+    # prototype docs, to avoid leaving orphaned files in prototype_videos.
+    async for proto in prototypes_col().find({"flavor_id": flavor_id}):
+        gridfs_id = proto.get("source_video_gridfs_id")
+        if gridfs_id:
+            await get_gridfs().delete(ObjectId(gridfs_id))
     await prototypes_col().delete_many({"flavor_id": flavor_id})
+    await flavors_col().delete_one({"_id": flavor_id})
     return {"deleted": True}

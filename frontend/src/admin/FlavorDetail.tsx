@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiDelete, apiGet, apiPatch, apiPost, apiUpload } from "../lib/api";
 import type { Flavor, Prototype } from "../lib/types";
+import WebcamRecorder from "../components/WebcamRecorder";
 
 export default function FlavorDetail() {
   const { flavorId } = useParams<{ flavorId: string }>();
@@ -11,6 +12,7 @@ export default function FlavorDetail() {
   const [textInput, setTextInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showRecorder, setShowRecorder] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadFlavor = () => {
@@ -79,6 +81,23 @@ export default function FlavorDetail() {
     }
   };
 
+  const handleRecordedVideo = async (blob: Blob) => {
+    if (!flavorId) return;
+    setBusy(true);
+    setError(null);
+    const formData = new FormData();
+    formData.append("video", blob, "reference.webm");
+    try {
+      await apiUpload(`/admin/flavors/${flavorId}/prototypes/video`, formData, true);
+      loadPrototypes();
+      setShowRecorder(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to record demo clip");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const toggleActive = async (prototypeId: string, isActive: boolean) => {
     await apiPatch(`/admin/prototypes/${prototypeId}?is_active=${!isActive}`, {}, true);
     loadPrototypes();
@@ -141,7 +160,8 @@ export default function FlavorDetail() {
 
       <div className="mb-6 flex flex-col gap-3 rounded-2xl bg-slate-900 p-5">
         <p className="text-sm text-slate-400">
-          Add a text prototype (bootstrap, no video needed) or upload a real demo clip (more accurate, stored long-term in GridFS).
+          Add a text prototype (bootstrap, no video needed), upload a pre-recorded demo clip, or
+          record one live via webcam — all are stored long-term in GridFS once added.
         </p>
         <div className="flex gap-2">
           <input
@@ -158,7 +178,8 @@ export default function FlavorDetail() {
             Add Text Prototype
           </button>
         </div>
-        <div>
+
+        <div className="flex flex-wrap items-center gap-3 border-t border-white/10 pt-3">
           <input
             ref={fileInputRef}
             type="file"
@@ -167,7 +188,28 @@ export default function FlavorDetail() {
             onChange={(e) => e.target.files?.[0] && handleUploadVideo(e.target.files[0])}
             className="text-sm text-slate-300"
           />
+          <span className="text-xs text-slate-500">or</span>
+          <button
+            onClick={() => setShowRecorder((v) => !v)}
+            disabled={busy}
+            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold hover:bg-white/20 disabled:opacity-50"
+          >
+            {showRecorder ? "Cancel Recording" : "Record Reference Clip"}
+          </button>
         </div>
+
+        {showRecorder && (
+          <div className="mt-2">
+            <WebcamRecorder
+              onRecorded={handleRecordedVideo}
+              disabled={busy}
+              buttonLabel="Record Reference Clip"
+              countdownSeconds={3}
+              recordSeconds={4}
+            />
+          </div>
+        )}
+
         {error && <p className="text-sm text-red-400">{error}</p>}
       </div>
 
