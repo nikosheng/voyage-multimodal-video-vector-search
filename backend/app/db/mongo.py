@@ -1,4 +1,5 @@
 """MongoDB (Atlas) connection management — uses motor as the async driver."""
+import certifi
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase, AsyncIOMotorGridFSBucket
 
 from app.config import get_settings
@@ -12,7 +13,12 @@ def get_client() -> AsyncIOMotorClient:
     global _client
     if _client is None:
         settings = get_settings()
-        _client = AsyncIOMotorClient(settings.mongodb_uri)
+        # Pass certifi's CA bundle explicitly. Without this, TLS handshakes
+        # to Atlas can fail with "[SSL: CERTIFICATE_VERIFY_FAILED]" on
+        # systems whose OS trust store Python/OpenSSL can't see (common on
+        # macOS with python.org/pyenv-installed Python, and in minimal
+        # Docker base images).
+        _client = AsyncIOMotorClient(settings.mongodb_uri, tlsCAFile=certifi.where())
     return _client
 
 
