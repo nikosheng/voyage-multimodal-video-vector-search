@@ -161,7 +161,8 @@ export default function FlavorDetail() {
       <div className="mb-6 flex flex-col gap-3 rounded-2xl bg-slate-900 p-5">
         <p className="text-sm text-slate-400">
           Add a text prototype (bootstrap, no video needed), upload a pre-recorded demo clip, or
-          record one live via webcam — all are stored long-term in GridFS once added.
+          record one live via webcam. Text prototypes stack freely, but uploading or recording a
+          new video replaces this flavor's existing reference clip (each flavor keeps at most one).
         </p>
         <div className="flex gap-2">
           <input

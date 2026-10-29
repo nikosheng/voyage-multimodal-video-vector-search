@@ -21,6 +21,24 @@ async def _assert_flavor_exists(flavor_id: str):
         raise HTTPException(status_code=404, detail="Flavor not found")
 
 
+async def _replace_video_prototypes(flavor_id: str):
+    """Delete all existing video prototypes (and their GridFS blobs) for a
+    flavor. Called right before inserting a newly-recorded/uploaded clip so
+    each flavor always has at most one active reference video -- text
+    prototypes are untouched."""
+    old_docs = [
+        doc
+        async for doc in prototypes_col().find(
+            {"flavor_id": flavor_id, "modality": "video"}
+        )
+    ]
+    for old in old_docs:
+        old_gridfs_id = old.get("source_video_gridfs_id")
+        if old_gridfs_id:
+            await get_gridfs().delete(ObjectId(old_gridfs_id))
+        await prototypes_col().delete_one({"_id": old["_id"]})
+
+
 @router.post("/flavors/{flavor_id}/prototypes/text")
 async def add_text_prototype(flavor_id: str, payload: TextPrototypeIn):
     await _assert_flavor_exists(flavor_id)
@@ -46,8 +64,11 @@ async def add_text_prototype(flavor_id: str, payload: TextPrototypeIn):
 
 @router.post("/flavors/{flavor_id}/prototypes/video")
 async def add_video_prototype(flavor_id: str, video: UploadFile = File(...)):
-    """Upload an admin-curated demo clip: store it in GridFS (long-term)
-    and embed it to create a new prototype."""
+    """Upload or record an admin-curated demo clip: store it in GridFS
+    (long-term) and embed it to create a new prototype. Replaces any
+    existing video prototype(s) for this flavor once the new clip is
+    successfully embedded -- each flavor keeps at most one reference video
+    (text prototypes are unaffected and can still be added freely)."""
     await _assert_flavor_exists(flavor_id)
     raw_bytes = await video.read()
     suffix = ".webm"
@@ -67,6 +88,11 @@ async def add_video_prototype(flavor_id: str, video: UploadFile = File(...)):
             except Exception as e:  # noqa: BLE001
                 await get_gridfs().delete(gridfs_id)
                 raise HTTPException(status_code=502, detail=f"Voyage embedding failed: {e}") from e
+
+    # 3) The new clip embedded successfully -- now it's safe to replace the
+    #    old reference video (if any). If embedding had failed above, the
+    #    old clip is left untouched.
+    await _replace_video_prototypes(flavor_id)
 
     doc = {
         "flavor_id": flavor_id,
