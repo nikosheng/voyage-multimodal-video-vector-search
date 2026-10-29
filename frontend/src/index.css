@@ -140,3 +140,148 @@ body {
 .bob {
   animation: bob 3s ease-in-out infinite;
 }
+
+/* ---------- Santa delivery reveal (Home result card) ---------- */
+
+@keyframes overlay-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.overlay-fade-in {
+  animation: overlay-fade-in 0.3s ease-out both;
+}
+
+@keyframes overlay-fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.overlay-fade-out {
+  animation: overlay-fade-out 0.5s ease-in both;
+}
+
+@keyframes sleigh-deliver {
+  0% {
+    transform: translate(-130vw, -40px) rotate(-12deg);
+    opacity: 0;
+  }
+  55% {
+    transform: translate(-6%, -10px) rotate(4deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(2%, 2px) rotate(-2deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.sleigh-deliver {
+  animation: sleigh-deliver 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes sleigh-exit {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(130vw, -60px) rotate(10deg);
+    opacity: 0;
+  }
+}
+
+.sleigh-exit {
+  animation: sleigh-exit 0.6s cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+
+@keyframes speech-pop {
+  0% {
+    transform: scale(0) translateY(6px);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1) translateY(-2px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.speech-pop {
+  animation: speech-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s both;
+}
+
+@keyframes gift-drop {
+  0% {
+    transform: translateY(-90px) scale(0.4) rotate(-20deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(8px) scale(1.2) rotate(6deg);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-4px) scale(0.95) rotate(-2deg);
+  }
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.emoji-reveal {
+  animation:
+    gift-drop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s both,
+    bob 3s ease-in-out infinite 1.4s;
+}
+
+@keyframes result-pop {
+  0% {
+    transform: scale(0) rotate(-20deg);
+    opacity: 0;
+  }
+  55% {
+    transform: scale(1.18) rotate(4deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(0.94) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.result-pop {
+  animation: result-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+}
+
+@keyframes result-shrink-out {
+  0% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.3) rotate(14deg);
+    opacity: 0;
+  }
+}
+
+.result-shrink-out {
+  animation: result-shrink-out 0.5s cubic-bezier(0.55, 0, 1, 0.45) both;
+}
