@@ -38,8 +38,9 @@ async def add_text_prototype(flavor_id: str, payload: TextPrototypeIn):
         "created_by": "admin",
         "created_at": datetime.now(timezone.utc),
     }
-    result = await prototypes_col().insert_one(doc)
-    doc["id"] = str(result.inserted_id)
+    await prototypes_col().insert_one(doc)
+    doc["id"] = str(doc.pop("_id"))
+    doc.pop("embedding", None)  # don't return the raw vector, keep payload small
     return doc
 
 
@@ -80,8 +81,9 @@ async def add_video_prototype(flavor_id: str, video: UploadFile = File(...)):
         "created_by": "admin",
         "created_at": datetime.now(timezone.utc),
     }
-    result = await prototypes_col().insert_one(doc)
-    doc["id"] = str(result.inserted_id)
+    await prototypes_col().insert_one(doc)
+    doc["id"] = str(doc.pop("_id"))
+    doc.pop("embedding", None)  # don't return the raw vector, keep payload small
     return doc
 
 

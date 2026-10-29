@@ -11,6 +11,7 @@ Notes:
 import sys
 import time
 from pathlib import Path
+import certifi
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -25,7 +26,7 @@ EMBEDDING_DIM = 1024  # voyage-multimodal-3.5 default dimension
 
 def main():
     settings = get_settings()
-    client = MongoClient(settings.mongodb_uri)
+    client = MongoClient(settings.mongodb_uri, tlsCAFile=certifi.where())
     db = client[settings.mongodb_db_name]
     collection = db["action_prototypes"]
 

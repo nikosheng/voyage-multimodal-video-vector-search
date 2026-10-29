@@ -8,7 +8,15 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'http://localhost:8000',
-      '/admin': 'http://localhost:8000',
+      '/admin': {
+        target: 'http://localhost:8000',
+        bypass(req) {
+          // Admin page routes and API routes share the /admin prefix.
+          if ((req.method === 'GET' || req.method === 'HEAD') && req.headers.accept?.includes('text/html')) {
+            return '/index.html'
+          }
+        },
+      },
     },
   },
 })

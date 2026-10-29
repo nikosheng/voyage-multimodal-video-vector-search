@@ -9,6 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import certifi
 from pymongo import MongoClient
 
 from app.config import get_settings
@@ -95,7 +96,7 @@ FLAVORS = [
 
 def main():
     settings = get_settings()
-    client = MongoClient(settings.mongodb_uri)
+    client = MongoClient(settings.mongodb_uri, tlsCAFile=certifi.where())
     db = client[settings.mongodb_db_name]
     now = datetime.now(timezone.utc)
 
